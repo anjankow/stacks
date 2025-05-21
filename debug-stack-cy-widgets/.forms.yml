@@ -1,0 +1,215 @@
+.definitions:
+  sections:
+    - section: &tagged-worker
+        name: worker
+        groups:
+          - name: worker
+            technologies: [pipeline]
+            vars:
+              - key: worker_tag
+                name: Worker tag
+                type: string
+                widget: simple_text
+                default:
+                description: |+
+                  The tags by which to match workers. The jobs will run on workers that match the given tags. Leave it empty to use non tagged workers.
+                  Check the stack README for guidance on how to run a local worker.
+version: '2'
+use_cases:
+  - name: debug-pipeline
+    sections:
+      - *tagged-worker
+  - name: debug-stackforms
+    sections:
+      - name: section
+        groups:
+          - name: simple text
+            technologies: [pipeline]
+            vars:
+            - name: "simple_text"
+              description: "Only `string` allowed"
+              key: "simple_text_var"
+              widget: "simple_text"
+              type: "string"
+              default: |+
+                Some text value
+            - name: "simple_text with unit"
+              description: "Only `string` allowed"
+              key: "simple_text_unit_var"
+              widget: "simple_text"
+              type: "string"
+              default: |+
+                Some text value
+              unit: "($, GHz, GB)"
+          - name: group
+            technologies: [pipeline]
+            vars:
+            - name: "auto_complete"
+              description: |+
+                Only `string` allowed.
+                Values listed here are suggestions, user can input arbitrary values.
+              key: "auto_complete_var"
+              widget: "auto_complete"
+              type: "string"
+              values: ["foo", "bar", "baz"]
+            - name: "dropdown"
+              description: |+
+                A dropdown of type `string`.
+              key: "dropdown_var"
+              widget: "dropdown"
+              type: "string"
+              values: ["foo", "bar", "baz"]
+            - name: "number"
+              description: "A number input of type `integer`."
+              key: "number_var"
+              widget: "number"
+              type: "integer"
+              default: 42
+            - name: "number float"
+              description: "A number input of type `float`."
+              key: "number_float_var"
+              widget: "number"
+              type: "float"
+              default: 3.14
+            - name: "radios boolean"
+              description: |+
+                A radio group of type `boolean`.
+              key: "radios_var"
+              widget: "radios"
+              type: "boolean"
+              values: [true, false]
+            - name: "radios string"
+              description: |+
+                A radio group of type `string`.
+              key: "radios_string_var"
+              widget: "radios"
+              type: "string"
+              values: ["foo", "bar", "baz"]
+            - name: "radios vertical"
+              description: |+
+                A vertical radio group.
+                *Not supported by the frontend yet.*
+              key: "radios_vertical_var"
+              widget: "radios"
+              type: "string"
+              values: ["foo", "bar", "baz"]
+              widget_config:
+                orientation: vertical
+            - name: "slider_list"
+              description: |+
+                A slider list of type `string`.
+              key: "slider_list_var"
+              widget: "slider_list"
+              type: "string"
+              values: ["foo", "bar", "baz"]
+            - name: "slider_list crowded"
+              description: |+
+                A slider list with too many options.
+              key: "slider_list_crowded_var"
+              widget: "slider_list"
+              type: "string"
+              values: ["one", "two", "three", "four", "five", "six", "seven", "height", "nine", "ten", "eleven", "twelve"]
+            - name: "slider_range"
+              description: |+
+                A slider range of type `integer` (the only type supported).
+              key: "slider_range_var"
+              widget: "slider_range"
+              type: "integer"
+              values: [24, 48] # [min, max]
+            - name: "switch"
+              description: |+
+                A switch of type `boolean` (the only type supported).
+              key: "switch_var"
+              widget: "switch"
+              type: "boolean"
+            - name: "Map text_area"
+              description: "Variable type set to `map`."
+              key: "text_area_mapr"
+              widget: "text_area"
+              type: "map"
+            - name: "Array text_area"
+              description: "Variable type set to `array`."
+              key: "text_area_array"
+              widget: "text_area"
+              type: "array"
+            - name: "Raw text_area"
+              description: "Variable type set to `raw`."
+              key: "text_area_raw"
+              widget: "text_area"
+              type: "raw"
+            - name: "cy_inventory_resource"
+              description: "Select a resource attribute from the inventory and link the value to this asset"
+              key: "cy_inventory_resource_var"
+              type: "string"
+              widget: "cy_inventory_resource"
+              widget_config:
+                attribute: "id"
+            - name: "cy_cred"
+              description: "A cycloid credential"
+              key: "cy_cred_var"
+              widget: "cy_cred"
+              type: "string"
+          - name: mapped values
+            technologies: [pipeline]
+            vars:
+            - name: "dropdown"
+              description: |+
+                A dropdown with mapped values.
+                ```
+                  values: [{ label: "Small", value: t2.small }, { label: "Medium", value: t2.medium }, { label: "Large", value: t2.large }]
+                ```
+              key: "mapped_dropdown_var"
+              widget: "dropdown"
+              type: map
+              values: [{ label: "Small", value: t2.small }, { label: "Medium", value: t2.medium }, { label: "Large", value: t2.large }]
+          - name: value_ref
+            technologies: [pipeline]
+            vars:
+            - name: "dropdown"
+              description: |+
+                A dropdown using `value_ref`, fetching values on a remote URL.
+              key: "value_ref_dropdown_var"
+              widget: "dropdown"
+              type: "string"
+              values: ["foo", "bar", "baz"]
+              values_ref: "https://api.npoint.io/f12d0129caadfbc6bd50"
+          - name: validation
+            technologies: [pipeline]
+            vars:
+            - name: "regex_validation"
+              description: |+
+                This widget value is matched against the regex `.*test.*`.
+              key: "regex_validation_var"
+              widget: "simple_text"
+              type: "string"
+              validations:
+                - regexp: '.*test.*'
+                  error_message: 'the value must contain the word test'
+      - *tagged-worker
+  - name: aws
+    sections:
+      - *tagged-worker
+  - name: google
+    sections:
+      - *tagged-worker
+  - name: azure
+    sections:
+      - *tagged-worker
+  - name: vmware
+    sections:
+      - *tagged-worker
+  - name: flexibleengine
+    sections:
+      - *tagged-worker
+  - name: scaleway
+    sections:
+      - *tagged-worker
+  - name: ovh
+    sections:
+      - *tagged-worker
+  - name: alibaba
+    sections:
+      - *tagged-worker
+  - name: oracle
+    sections:
+      - *tagged-worker

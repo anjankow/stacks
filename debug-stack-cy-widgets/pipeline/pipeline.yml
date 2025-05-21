@@ -1,0 +1,33 @@
+jobs:
+- name: dummy-job
+  build_logs_to_retain: 3
+  plan:
+  - task: dummy-task
+    tags: [((worker_tag))]
+    config:
+        platform: linux
+        image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: latest }
+        run:
+          path: /bin/sh
+          args:
+          - -ec
+          - |
+            echo -e ",___,\n(O,O)\n/)_)\n \"\""
+($- if or (eq .environment "prod") (eq .environment "demo") $)
+  - task: dummy-task-prod-or-demo-only
+    tags: [((worker_tag))]
+    config:
+        platform: linux
+        image_resource:
+            type: registry-image
+            source: { repository: busybox, tag: latest }
+        run:
+          path: /bin/sh
+          args:
+          - -ec
+          - |
+            echo -e ",___,\n(O,O)\n/)_)\n \"\""
+            echo -e "This task is only made available when the env is prod or demo"
+($- end $)

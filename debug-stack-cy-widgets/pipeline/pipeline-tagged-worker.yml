@@ -1,0 +1,237 @@
+---
+# Definitions
+.definitions:
+  shared:
+    - &tags
+      tags: [((worker_tag))]
+  jobs:
+    - &dummy-job
+      plan:
+        - get: nada
+          resource: nada
+          trigger: true
+          <<: *tags
+        - put: nada
+          <<: *tags
+
+# Pipeline
+resources:
+  - name: nada
+    type: dummy-resource-type
+    source: null
+    icon: texture-box
+    <<: *tags
+  - name: void
+    type: dummy-resource-type
+    source: null
+    icon: flip-horizontal
+    <<: *tags
+  - name: abyss
+    type: dummy-resource-type
+    source: null
+    icon: set-none
+    <<: *tags
+resource_types:
+  - name: dummy-resource-type
+    type: registry-image
+    source:
+      repository: ktrysmt/concourse-dummy-resource
+jobs:
+  - name: 🎨️ debug-job
+    build_logs_to_retain: 10
+    plan:
+      - get: nada
+        resource: nada
+        <<: *tags
+        trigger: true
+        version: every
+      - put: nada
+        <<: *tags
+      - task: random-failing-task
+        <<: *tags
+        config:
+          platform: linux
+          image_resource:
+            name: ''
+            type: registry-image
+            source:
+              repository: busybox
+          run:
+            path: /bin/sh
+            args:
+              - '-ec'
+              - |
+                echo -e ",___,\n(O,O)\n/)_)\n \"\""
+
+                for fg in 30 31 32 33 34 35 36 37 ; do
+                  fgbright=`expr $fg + 60`
+                  bg=`expr $fg + 10`
+                  bgbright=`expr $fg + 70`
+                  printf "\033[${bg}m    \033[${bgbright}m    \033[0m   \033[${fg}m... base \033[${fgbright}m... bright \033[0m\n"
+                done
+
+                if [ `expr $RANDOM % 2` -eq 0 ]; then
+                  printf "\n\033[41;30m  ERROR  \033[0m"
+                  exit 1
+                else
+                  printf "\n\033[42;30m  SUCCESS  \033[0m"
+                fi
+      - in_parallel:
+          steps:
+            - task: in-parallel-a-task
+              <<: *tags
+              config:
+                platform: linux
+                image_resource:
+                  name: ''
+                  type: registry-image
+                  source:
+                    repository: busybox
+                run:
+                  path: /bin/sh
+                  args:
+                    - '-ec'
+                    - |
+                      printf "\n\033[42;30m  SUCCESS  \033[0m in parallel A"
+              on_success:
+                put: nada
+                <<: *tags
+            - task: in-parallel-b-task
+              <<: *tags
+              config:
+                platform: linux
+                image_resource:
+                  name: ''
+                  type: registry-image
+                  source:
+                    repository: busybox
+                run:
+                  path: /bin/sh
+                  args:
+                    - '-ec'
+                    - |
+                      printf "\n\033[42;30m  SUCCESS 1  \033[0m in parallel B"
+              on_success:
+                put: nada
+                <<: *tags
+      - do:
+          - task: do-task
+            <<: *tags
+            config:
+              platform: linux
+              image_resource:
+                name: ''
+                type: registry-image
+                source:
+                  repository: busybox
+              run:
+                path: /bin/sh
+                args:
+                  - '-ec'
+                  - |
+                    printf "\n\033[42;30m  SUCCESS  \033[0m do block"
+      - try:
+          task: try-task
+          <<: *tags
+          config:
+            platform: linux
+            image_resource:
+              name: ''
+              type: registry-image
+              source:
+                repository: busybox
+            run:
+              path: /bin/sh
+              args:
+                - '-ec'
+                - |
+                  printf "\n\033[41;30m  ERROR  \033[0m"
+                  exit 1
+          on_failure:
+            do:
+              - put: nada
+                <<: *tags
+              - put: nada
+                <<: *tags
+          on_success:
+            do:
+              - put: nada
+                <<: *tags
+              - put: nada
+                <<: *tags
+  - <<: *dummy-job
+    name: Alpha
+    plan:
+      - get: nada
+        resource: nada
+        <<: *tags
+        trigger: true
+        version: every
+      - put: nada
+        <<: *tags
+      - put: abyss
+        <<: *tags
+      - task: failing-task
+        <<: *tags
+        config:
+          platform: linux
+          image_resource:
+            name: ''
+            type: registry-image
+            source:
+              repository: busybox
+          run:
+            path: /bin/sh
+            args:
+              - '-ec'
+              - |
+                  exit 1
+  - <<: *dummy-job
+    name: Bravo
+  - <<: *dummy-job
+    name: Charly
+  - <<: *dummy-job
+    name: Delta
+  - <<: *dummy-job
+    name: Echo
+  - <<: *dummy-job
+    name: Foxtrot
+  - <<: *dummy-job
+    name: Golf
+    plan:
+      - get: nada
+        resource: nada
+        <<: *tags
+        trigger: true
+        version: every
+        passed: [Alpha, Delta, Charly]
+  - name: Hotel
+    plan:
+    - get: void
+      resource: void
+      <<: *tags
+    - put: void
+      <<: *tags
+  - name: India
+    plan:
+    - get: void
+      resource: void
+      <<: *tags
+  - <<: *dummy-job
+    name: Juliet
+    plan:
+      - get: abyss
+        resource: abyss
+        <<: *tags
+        trigger: true
+        version: every
+        passed: [Alpha]
+  - <<: *dummy-job
+    name: Kilo
+    plan:
+      - get: abyss
+        resource: abyss
+        <<: *tags
+        trigger: true
+        version: every
+        passed: [Juliet]

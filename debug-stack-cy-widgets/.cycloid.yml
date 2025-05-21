@@ -1,0 +1,79 @@
+---
+# Definitions
+.definitions:
+  pipelines:
+    - pipeline: &default-pipeline
+        pipeline:
+          path: 'pipeline/pipeline.yml'
+        variables:
+          path: 'pipeline/variables.sample.yml'
+          destination: '($ .config_root $)/pipeline/variables.yml'
+# Configuration of the Cycloid stack
+version: '4'
+name: 'debug-stack-for-cy-widgets'
+canonical: 'debug-stack-for-cy-widgets'
+description: |
+  Copied from debug-stack in github.com/Thomas-lhuillier/catalog-repo to test cy widgets.
+keywords:
+  - 'debug'
+  - 'dummy'
+  - 'provider:aws'
+  - 'provider:gcp'
+  - 'provider:scw'
+author: "Thomas L'huillier"
+image: 'https://i.imgur.com/HnLTLxK.png'
+technologies:
+  - technology: cycloid
+    version: n/a
+  - technology: concourse
+    version: n/a
+config:
+  debug-pipeline:
+    name: 'Debug pipeline'
+    description: 'Render pipeline, jobs and terminal output'
+    pipeline:
+      pipeline:
+        path: 'pipeline/pipeline-tagged-worker.yml'
+      variables:
+        path: 'pipeline/variables.sample.yml'
+        destination: '($ .config_root $)/pipeline/variables.yml'
+  debug-stackforms:
+    name: 'Debug stackforms'
+    description: 'Render a wide variety stackforms widgets'
+    pipeline: *default-pipeline
+  aws:
+    name: 'Amazon Web Services'
+    cloud_provider: 'aws'
+    pipeline: *default-pipeline
+  google:
+    name: 'Google Cloud Provider'
+    cloud_provider: 'google'
+    pipeline: *default-pipeline
+  azure:
+    name: 'Microsoft Azure'
+    cloud_provider: 'azurerm'
+    pipeline: *default-pipeline
+  vmware:
+    name: 'VMware'
+    cloud_provider: 'vmware'
+    pipeline: *default-pipeline
+  flexibleengine:
+    name: 'Flexible Engine'
+    cloud_provider: 'flexibleengine'
+    pipeline: *default-pipeline
+  scaleway:
+    name: 'Scaleway'
+    cloud_provider: 'scaleway'
+    pipeline: *default-pipeline
+  ovh:
+    name: 'OVHcloud'
+    cloud_provider: 'ovh'
+    pipeline: *default-pipeline
+  alibaba:
+    name: 'Alibaba Cloud'
+    cloud_provider: 'alibaba'
+    pipeline: *default-pipeline
+  oracle:
+    name: 'Oracle Cloud'
+    cloud_provider: 'oracle'
+    pipeline: *default-pipeline
